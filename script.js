@@ -19,54 +19,52 @@ const cityData = document.getElementById('cityData');
 const button = document.getElementById('button');
 const input = document.getElementById('input');
 
-function fetchWeather() {
-  let city = input.value.trim();
-  city = city.toLowerCase();
-  const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&APPID=5d066958a60d315387d9492393935c19`;
+async function fetchWeather() {
+  const city = input.value.trim().toLowerCase();
 
   if (!city) {
     alert('Please enter a city name');
     return;
   }
 
-  fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('City not found');
-      }
-      return response.json();
-    })
-    .then(data => {
-      const { temp, pressure, humidity } = data.main;
-      const { description } = data.weather[0];
-      const { speed, deg } = data.wind;
-      const icon = data.weather[0].icon;
-      const iconUrl = `http://openweathermap.org/img/w/${icon}.png`;
+  const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&APPID=5d066958a60d315387d9492393935c19`;
 
-      cityData.innerHTML = `
-        <h2>Weather in ${data.name}</h2>
-        <p><strong>Temperature:</strong> ${temp}°C</p>
-        <p><strong>Pressure:</strong> ${pressure} hPa</p>
-        <p><strong>Description:</strong> ${description}</p>
-        <p><strong>Humidity:</strong> ${humidity}%</p>
-        <p><strong>Wind Speed:</strong> ${speed} m/s</p>
-        <p><strong>Wind Direction:</strong> ${deg}°</p>
-        <img src="${iconUrl}" alt="Weather icon">
-      `;
-    })
-    .catch(error => {
-      cityData.innerHTML = `<p style="color:red;">City not found. Please try again.</p>`;
-    });
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('City not found');
+    }
+
+    const data = await response.json();
+    const { temp, pressure, humidity } = data.main;
+    const { description } = data.weather[0];
+    const { speed, deg } = data.wind;
+    const icon = data.weather[0].icon;
+    const iconUrl = `http://openweathermap.org/img/w/${icon}.png`;
+
+    cityData.innerHTML = `
+      <h2>Weather in ${data.name}</h2>
+      <p><strong>Temperature:</strong> ${temp}°C</p>
+      <p><strong>Pressure:</strong> ${pressure} hPa</p>
+      <p><strong>Description:</strong> ${description}</p>
+      <p><strong>Humidity:</strong> ${humidity}%</p>
+      <p><strong>Wind Speed:</strong> ${speed} m/s</p>
+      <p><strong>Wind Direction:</strong> ${deg}°</p>
+      <img src="${iconUrl}" alt="Weather icon">
+    `;
+  } catch (error) {
+    cityData.innerHTML = `<p style="color:red;">City not found. Please try again.${error}</p>`;
+  }
 }
 
 button.addEventListener('click', fetchWeather);
 input.addEventListener('keydown', (event) => {
-  event.preventDefault();
   if (event.key === 'Enter') {
+    event.preventDefault();
     fetchWeather();
   }
-}
-);
+});
+
 
 
 
