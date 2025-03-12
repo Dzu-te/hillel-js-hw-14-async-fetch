@@ -22,7 +22,7 @@ const input = document.getElementById('input');
 async function fetchWeather() {
   const city = input.value.trim().toLowerCase();
 
-  if (!city || city.length === 0 || typeof city !== 'string') {
+  if (!city || city.length === 0) {
     alert('Please enter a city name');
     return;
   }
